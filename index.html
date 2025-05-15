@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Sudoku Solver</title>
+  <script type="text/javascript" src="sudoku.js"></script>
+  <script type="text/javascript" src="analytics.js"></script>
+  <style type="text/css">
+    body {
+      font-family: Calibri, sans-serif;
+    }
+
+    #container {
+      text-align: center;
+      padding-bottom: 100px;
+    }
+
+    table {
+      border-collapse: collapse;
+      font-size: 2em;
+      margin: 0 auto;
+    }
+
+    colgroup, tbody {
+      border: solid medium;
+    }
+
+    td {
+      border: solid thin;
+      height: 1.4em;
+      width: 1.4em;
+      text-align: center;
+      padding: 0;
+    }
+
+    button {
+      margin-top: 15px;
+      font-size: 1.2em;
+      padding: 5px 15px;
+    }
+
+    h1 {
+      padding-bottom: 20px;
+    }
+
+    img {
+      height: 100px;
+      width: 400px;
+      float: left;
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <img src="gfg.png" alt="GFG Logo">
+    <h1>Sudoku Solver</h1>
+    <table id="sudoku-board">
+      <colgroup><col><col><col></colgroup>
+      <colgroup><col><col><col></colgroup>
+      <colgroup><col><col><col></colgroup>
+      <tbody>
+        <!-- 9 rows of 9 cells -->
+        <!-- You can use a loop to generate this in JS, but here’s manual for clarity -->
+        <!-- Each row is created with <tr> and 9 <td> -->
+        <!-- All are contenteditable for user input -->
+        <!-- Row 1 -->
+        <tr>
+          <td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td>
+          <td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td>
+          <td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td>
+        </tr>
+        <!-- Row 2 -->
+        <tr>
+          <td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td>
+          <td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td>
+          <td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td>
+        </tr>
+        <!-- Row 3 -->
+        <tr>
+          <td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td>
+          <td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td>
+          <td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td>
+        </tr>
+        <!-- Row 4 -->
+        <tr>
+          <td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td>
+          <td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td>
+          <td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td>
+        </tr>
+        <!-- Row 5 -->
+        <tr>
+          <td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td>
+          <td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td>
+          <td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td>
+        </tr>
+        <!-- Row 6 -->
+        <tr>
+          <td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td>
+          <td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td>
+          <td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td>
+        </tr>
+        <!-- Row 7 -->
+        <tr>
+          <td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td>
+          <td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td>
+          <td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td>
+        </tr>
+        <!-- Row 8 -->
+        <tr>
+          <td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td>
+          <td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td>
+          <td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td>
+        </tr>
+        <!-- Row 9 -->
+        <tr>
+          <td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td>
+          <td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td>
+          <td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td>
+        </tr>
+      </tbody>
+    </table>
+    <div>
+      <button id="solve-button">Solve!</button>
+      <button id="clear-button">Clear board</button>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    // Validate input: only allow 1–9
+    document.getElementById("sudoku-board").addEventListener("keyup", function(event) {
+      if (event.target && event.target.nodeName === "TD") {
+        var validNum = /^[1-9]$/;
+        var tdEl = event.target;
+        var val = tdEl.innerText.trim();
+        if (!validNum.test(val)) {
+          tdEl.innerText = "";
+        } else {
+          tdEl.innerText = val;
+        }
+      }
+    });
+
+    document.getElementById("solve-button").addEventListener("click", function() {
+      var boardString = boardToString();
+      var solution = SudokuSolver.solve(boardString); // Assumes SudokuSolver is loaded from sudoku.js
+      if (solution) {
+        stringToBoard(solution);
+      } else {
+        alert("Invalid board!");
+      }
+    });
+
+    document.getElementById("clear-button").addEventListener("click", clearBoard);
+
+    function clearBoard() {
+      var tds = document.getElementsByTagName("td");
+      for (var i = 0; i < tds.length; i++) {
+        tds[i].innerText = "";
+      }
+    }
+
+    function boardToString() {
+      var string = "";
+      var validNum = /^[1-9]$/;
+      var tds = document.getElementsByTagName("td");
+      for (var i = 0; i < tds.length; i++) {
+        var val = tds[i].innerText.trim();
+        if (validNum.test(val)) {
+          string += val;
+        } else {
+          string += "-";
+        }
+      }
+      return string;
+    }
+
+    function stringToBoard(string) {
+      var tds = document.getElementsByTagName("td");
+      for (var i = 0; i < string.length && i < tds.length; i++) {
+        if (string[i] !== "-") {
+          tds[i].innerText = string[i];
+        } else {
+          tds[i].innerText = "";
+        }
+      }
+    }
+  </script>
+</body>
+</html>
